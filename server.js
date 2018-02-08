@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const path=require('path');
 const app = express();
 const server = require('http').Server(app);
-const db = process.env.MONGODB_URI || "mongodb://localhost/record";
+const db = process.env.MONGODB_URI || "mongodb://localhost/recordrecord";
 mongoose.connect(db, function(error) {
   // Log any errors connecting with mongoose
   if (error) {
@@ -39,13 +39,18 @@ var jobsController = require("./controllers/routes.js");
 var router = new express.Router();
 router.get("/job/:recruiter", jobsController.findbyrecruiter);
 router.get("/data/:search", jobsController.findjob);
-router.get("/:email/:pwd", jobsController.finduser);
+router.post('/login',jobsController.signin); 
 router.get("/:id", jobsController.findbyid);
 router.get("/data/all/all", jobsController.findall);
 router.post("/addjob", jobsController.insertjob);
 router.post("/adduser", jobsController.insertuser);
 router.post("/addApli", jobsController.insertApli);
 router.get("/appli/:id", jobsController.findbyApplibyApplicant);
+router.post('/update/:id',jobsController.update);
+router.get("/user/:id", jobsController.finduser); 
+
+
+
 app.use(router);
 
 server.listen(PORT);

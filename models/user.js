@@ -16,11 +16,16 @@ var userschema = new Schema({
   },
   Email: {
     type: String,
-    required: true
+    required: true,
+    unique : true,
+    validate: function(email) {
+      return /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)
+    }
   },
   Pwd: {
     type: String,
-    required: true
+    required: true,
+    minlength: 8
   },
   Photo: {
    type: String,
@@ -32,7 +37,23 @@ var userschema = new Schema({
   },
   resume: {
   type: String,
+  },
+  photo: {
+  type: String,
+  },
+    about: {
+  type: String,
+  },
+    experience: {
+  type: String,
+  },
+    skills: {
+  type: String,
+  },
+  video:{
+    type: String,
   }
+  
 });
 
 // Create the JobSeeker model with Mongoose

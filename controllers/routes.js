@@ -1,6 +1,9 @@
 var Jobs = require("../models/Jobs.js");
 var user =require("../models/user.js");
 var Apli =require("../models/Applications.js");
+var jwt = require('jsonwebtoken');
+let TOKEN_SECRET= process.env.TOKEN_SECRET || 'pvpnCCZfwOF85pBjbOebZiYIDhZ3w9LZrKwBZ7152K89mPCOHtbRlmr5Z91ci4L';
+
 module.exports = {
   findjob: function(req, res) {
   console.log("Gathering saved articles from the db");
@@ -19,12 +22,8 @@ module.exports = {
     });
   }, 
   findall: function(req, res) {
-    Jobs.find()
-    .populate({
-    path: 'applications',
-    populate: { path: 'Applicant_id' }})
-    .exec(function (err, story) {
-    if (err) return handleError(err);
+    user.find()
+    .then(function (story) {
     res.send(story);
     });
   },
@@ -37,13 +36,13 @@ module.exports = {
   },
   insertuser: function(req, res) {
     user.create(req.body).then(function(data) {
-      console.log("data:", data);
+      res.send(data)
     }).catch(function(err) {
-      res.json(err);
+      res.send(err);
     });
   },
   finduser: function(req,res){
-    user.find({Email:req.params.email,Pwd:req.params.pwd}).then(function(user) {
+    user.find({_id:req.params.id}).then(function(user) {
         console.log(user);
       res.json(user);
     }).catch(function(err) {
@@ -94,7 +93,35 @@ module.exports = {
     }).catch(function(err) {
       res.json(err);
     });
-  } 
+  },
+  signin : function(req, res) {
+    user.findOne({Email:req.body.email,Pwd:req.body.pwd}).then((user,err)=> {
+        let playload={
+          '_id':user._id,
+          'type':user.Usertype
+        }
+        if(err){
+            return ;
+        }
+        if(!user){
+            return res.status(404).json({'message':'User not found!'});
+        }
+        let token = jwt.sign(playload,TOKEN_SECRET, {
+            expiresIn: 1440 // expires in 1 hour
+        });
+        console.log(token)
+        res.json({error:false,token:token});    }).catch(function(err) {
+        res.json(err);
+    });
+  },
+  update: function(req, res) {
+    user.findOneAndUpdate({_id:req.params.id},req.body).then(function(doc) {
+      res.json(doc);
+    }).catch(function(err) {
+      res.json(err);
+    });
+  }
+
 
 
 };
